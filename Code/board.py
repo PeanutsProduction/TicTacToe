@@ -111,14 +111,22 @@ class Board:
 
         while checker != (0,0):
             checker = self.tupleAdder(checker, self.NW)
-            if self.altBoard[checker] != playerSide:
+            try:
+                if self.altBoard[checker] != playerSide:
+                    diagonal1 = False
+                    break
+            except:
                 diagonal1 = False
                 break
         checker = start
 
         while checker != (self.size - 1, self.size - 1):
             checker = self.tupleAdder(checker, self.SE)
-            if self.altBoard[checker] != playerSide:
+            try:
+                if self.altBoard[checker] != playerSide:
+                    diagonal1 = False
+                    break
+            except:
                 diagonal1 = False
                 break
 
@@ -128,14 +136,22 @@ class Board:
 
         while checker != (self.size - 1,0):
             checker = self.tupleAdder(checker, self.NE)
-            if self.altBoard[checker] != playerSide:
+            try:
+                if self.altBoard[checker] != playerSide:
+                    diagonal2 = False
+                    break
+            except:
                 diagonal2 = False
                 break
         checker = start
 
         while checker != (0, self.size - 1):
             checker = self.tupleAdder(checker, self.SW)
-            if self.altBoard[checker] != playerSide:
+            try:
+                if self.altBoard[checker] != playerSide:
+                    diagonal2 = False
+                    break
+            except:
                 diagonal2 = False
                 break
         
