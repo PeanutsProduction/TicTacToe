@@ -1,6 +1,7 @@
 import math
 import tkinter
 from tkinter import *
+from tkinter import messagebox
 from board import Board # import Board class from board file
 
 
@@ -72,7 +73,7 @@ class UIHandler:
             anchor = "n",
             bd = 0,
             underline = len("TIC-TAC-TOE"),
-            font=(self.font, 25)
+            font=(self.font, 30)
         )
         gameNameText.grid(row = 0, column = 0, padx = 15, pady = 20) # grid
 
@@ -173,9 +174,8 @@ class UIHandler:
 
     def callback(self, event):
         #print ("clicked at", event.x, event.y)
-        print("thats square", math.floor(event.x/self.canvasGridIntervalsX), math.floor(event.y/self.canvasGridIntervalsY), "\n")
+        #print("thats square", math.floor(event.x/self.canvasGridIntervalsX), math.floor(event.y/self.canvasGridIntervalsY), "\n")
         self.playerDoTurn((math.floor(event.x/self.canvasGridIntervalsX), math.floor(event.y/self.canvasGridIntervalsY)))
-        self.switchTurn()
 
 
     def switchTurn(self):
@@ -183,6 +183,7 @@ class UIHandler:
             self.turn.set("X")
         elif self.turn.get() == "X":
             self.turn.set("O")
+        return self.turn.get()
 
 
     def createBoard(self, size):
@@ -194,9 +195,23 @@ class UIHandler:
             self.placePlayerSideOnButton(coord)
             self.board.turnsDone += 1
             if self.board.turnsDone > ((self.board.size - 1) * 2):
-                self.board.checkWin(coord, self.turn.get())
+                if self.board.checkWin(coord, self.turn.get()):
+                    self.winPopUp()
+                if self.board.turnsDone == (self.board.size ** 2):
+                    self.drawPopUp()
             self.switchTurn()
 
+
+    def winPopUp(self):
+        winner = str(self.turn.get())
+        winText = "Congrats! The winner is " + winner + "!"
+        messagebox.showinfo("WINNER",winText)
+        self.mw.destroy()
+
+
+    def drawPopUp(self):
+        messagebox.showinfo("DRAW","No one won! Its a draw!")
+        self.mw.destroy()
 
     def placePlayerSideOnButton(self, coord):
         x = (self.canvasGridIntervalsX/2) + (self.canvasGridIntervalsX * coord[0])
@@ -206,9 +221,6 @@ class UIHandler:
             self.create_circle(x, y, self.sizeOfIconsOnGrid())
         elif self.turn.get() == "X":
             self.create_cross(x, y, self.sizeOfIconsOnGrid())
-
-        print(self.board)
-        self.switchTurn()
         
 
     def sizeOfIconsOnGrid(self):
