@@ -178,6 +178,11 @@ class UIHandler:
         self.playerDoTurn((math.floor(event.x/self.canvasGridIntervalsX), math.floor(event.y/self.canvasGridIntervalsY)))
 
 
+    def getCentreOfClickedSquare(self, tuple):
+        x = (self.canvasGridIntervalsX/2) + (self.canvasGridIntervalsX * tuple[0])
+        y = (self.canvasGridIntervalsY/2) + (self.canvasGridIntervalsY * tuple[1])
+
+
     def switchTurn(self):
         if self.turn.get() == "O":
             self.turn.set("X")
@@ -192,11 +197,12 @@ class UIHandler:
     
     def playerDoTurn(self, coord):
         if self.board.setVal(coord, self.turn.get()):
-            self.placePlayerSideOnButton(coord)
+            self.placePlayerTurnOnCanvas(coord)
             self.board.turnsDone += 1
-            if self.board.turnsDone > ((self.board.size - 1) * 2):
+            if self.board.turnsDone > ((self.board.winCon - 1) * 2):
                 if self.board.checkWin(coord, self.turn.get()):
-                    self.winPopUp()
+                    self.drawWinLineOnCanvas()
+                    #self.winPopUp()
                 if self.board.turnsDone == (self.board.size ** 2):
                     self.drawPopUp()
             self.switchTurn()
@@ -213,15 +219,28 @@ class UIHandler:
         messagebox.showinfo("DRAW","No one won! Its a draw!")
         self.mw.destroy()
 
-    def placePlayerSideOnButton(self, coord):
-        x = (self.canvasGridIntervalsX/2) + (self.canvasGridIntervalsX * coord[0])
-        y = (self.canvasGridIntervalsY/2) + (self.canvasGridIntervalsY * coord[1])
+
+    def drawWinLineOnCanvas(self):
+        start = self.coordsToCanvas(self.board.winLineStart)
+        end = self.coordsToCanvas(self.board.winLineEnd)
+        self.canvasGrid.create_line(start[0], start[1], end[0], end[1], fill = self.textColor, width = 2)
+        print("DRAWN")
+
+
+    def placePlayerTurnOnCanvas(self, coord):
+        Pos = self.coordsToCanvas(coord)
 
         if self.turn.get() == "O":
-            self.create_circle(x, y, self.sizeOfIconsOnGrid())
+            self.create_circle(Pos[0], Pos[1], self.sizeOfIconsOnGrid())
         elif self.turn.get() == "X":
-            self.create_cross(x, y, self.sizeOfIconsOnGrid())
-        
+            self.create_cross(Pos[0], Pos[1], self.sizeOfIconsOnGrid())
+    
+    
+    def coordsToCanvas(self, coords):
+        x = (self.canvasGridIntervalsX/2) + (self.canvasGridIntervalsX * coords[0])
+        y = (self.canvasGridIntervalsY/2) + (self.canvasGridIntervalsY * coords[1])
+        return (x,y)
+
 
     def sizeOfIconsOnGrid(self):
         x = self.canvasGridIntervalsX
