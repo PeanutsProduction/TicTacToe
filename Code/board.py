@@ -12,7 +12,7 @@ class Board:
         # dictonary coordinates
         self.myBoard = CustomDictionary(self.size)
 
-        self.winCon = 4 # how many in a row to win (minimum 3)
+        self.winCon = 3 # how many in a row to win (minimum 3)
         self.turnsDone = 0 # how many turns have happened
 
         # coordinates to draw line over winning squares
@@ -51,15 +51,11 @@ class Board:
 
 
     def setVal(self, coord, valToSet): # e.g setVal((0,1), "O")
-        if type(coord) is not tuple:
-            print("ERROR! Please pass a tuple")
-
+        
         if self.myBoard.getValFromDict(coord).getData() == None:
             self.myBoard.getValFromDict(coord).setData(valToSet) 
-            #print("placed")
             return True
         else:
-            #print("something there")
             return False
         return False
         
@@ -78,7 +74,7 @@ class Board:
               
     
     def checkWin(self, coord, playerSide): # playerSide is "O" or "X"
-        if self.verticalWin(coord):
+        if self.verticalWin(coord) or self.horizontalWin(coord) or self.diagonalWin(coord):
             return True
         return False
 
@@ -129,6 +125,56 @@ class Board:
         return True
     
 
+    def diagonalWin(self, coord):
+        if self.Diag1(coord):
+            return True
+        if self.Diag2(coord):
+            return True
+        return False
+
+    def Diag1(self, coord):
+        playerSide = self.getNode(coord).getData()
+        pointer1 = pointer2 = self.getNode(coord)
+        counter = 1
+        while counter != self.winCon:
+            topleftSafe = pointer1.checkNextSquareSafe("topLeft", playerSide)
+            bottomrightSafe = pointer2.checkNextSquareSafe("bottomRight", playerSide)
+            if topleftSafe:
+                pointer1 = pointer1.getTopLeft()
+                counter += 1
+            if bottomrightSafe:
+                pointer2 = pointer2.getBottomRight()
+                counter += 1
+                continue
+            
+            if topleftSafe == False and bottomrightSafe == False and counter !=  self.winCon:
+                return False
+            
+        self.winLineStart = pointer1.getPosCord()
+        self.winLineEnd = pointer2.getPosCord()
+        return True
+
+    def Diag2(self, coord):
+        playerSide = self.getNode(coord).getData()
+        pointer1 = pointer2 = self.getNode(coord)
+        counter = 1
+        while counter != self.winCon:
+            toprightSafe = pointer1.checkNextSquareSafe("topRight", playerSide)
+            bottomleftSafe = pointer2.checkNextSquareSafe("bottomLeft", playerSide)
+            if toprightSafe:
+                pointer1 = pointer1.getTopRight()
+                counter += 1
+            if bottomleftSafe:
+                pointer2 = pointer2.getBottomLeft()
+                counter += 1
+                continue
+            
+            if toprightSafe == False and bottomleftSafe == False and counter !=  self.winCon:
+                return False
+            
+        self.winLineStart = pointer1.getPosCord()
+        self.winLineEnd = pointer2.getPosCord()
+        return True
     # def diagonalWin(self, coord, playerSide):
     #     start = checker = coord
         

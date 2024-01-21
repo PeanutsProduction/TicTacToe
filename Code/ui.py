@@ -124,7 +124,7 @@ class UIHandler:
         # Slider Button
         sliderButton = Button(
             newFrame, 
-            command = lambda: [self.createBoard(boardSizeSlider.get()), self.Game(boardSizeSlider.get(),newFrame)], 
+            command = lambda: [self.createBoard(boardSizeSlider.get()), self.chooseWinCon(boardSizeSlider.get(), newFrame)], 
             text = "Confirm",
             bg = self.bgColor, 
             fg = self.textColor, 
@@ -136,8 +136,56 @@ class UIHandler:
         sliderButton.grid(row = 2, column = 0, padx = newSizeX/4, pady = newSizeY/16)
     
 
-    def Game(self, sliderVal, oldFrame):
+    def chooseWinCon(self, boardSize, oldFrame):
         oldFrame.destroy()
+        if boardSize == 3:
+            self.Game(boardSize, None)
+        else:
+            WinConFrame = Frame(self.mw, bg = self.bgColor)
+            WinConFrame.place(in_=self.mw, anchor="center", relx = 0.5, rely = 0.5)
+            
+            # Text
+            sliderText = Label(WinConFrame, text = "Select how many in a row to win", font = (self.font, 20), fg = self.textColor, bg = self.bgColor)
+            sliderText.grid(row = 0, column = 0, padx = self.mw.winfo_width()/4, pady = self.mw.winfo_height()/16)
+
+            sliderLength = self.mw.winfo_width() * 0.8
+            #Slider
+            WinConSlider = Scale( # Min board size and max board size
+                WinConFrame, 
+                from_ = 3, 
+                to = boardSize,
+                relief = "flat",
+                highlightthickness = 0,
+                highlightcolor = self.bgColor,
+                borderwidth = 1,
+                font = (self.font, 10), 
+                bg = self.bgColor,
+                fg = self.textColor,
+                orient = HORIZONTAL,
+                length = round(sliderLength),
+                troughcolor = self.bgColor,
+                )
+            WinConSlider.place(in_=WinConFrame, anchor="center", relx = 0.5, rely = 0.5)
+            WinConSlider.grid(row = 1, column = 0, padx = (self.mw.winfo_width() - sliderLength)/2, pady = self.mw.winfo_height()/16)
+
+            # Slider Button
+            sliderButton = Button(
+                WinConFrame, 
+                command = lambda: [self.board.setWinCon(WinConSlider.get()), self.Game(boardSize, WinConFrame)], 
+                text = "Confirm",
+                bg = self.bgColor, 
+                fg = self.textColor, 
+                relief = "flat", 
+                font = (self.font, 15), 
+                activebackground = self.bgColor, 
+                activeforeground = self.textColor
+                )
+            sliderButton.grid(row = 2, column = 0, padx = self.mw.winfo_width()/4, pady = self.mw.winfo_height()/16)
+
+
+    def Game(self, sliderVal, oldFrame):
+        if oldFrame != None:
+            oldFrame.destroy()
 
         newSizeX = newSizeY = (self.screenDimensions[0] * 0.35)
         xPos = self.mw.winfo_x() + round(((self.screenDimensions[0] * 0.25) - (newSizeX))/2)
@@ -202,7 +250,7 @@ class UIHandler:
             if self.board.turnsDone > ((self.board.winCon - 1) * 2):
                 if self.board.checkWin(coord, self.turn.get()):
                     self.drawWinLineOnCanvas()
-                    #self.winPopUp()
+                    self.winPopUp()
                 if self.board.turnsDone == (self.board.size ** 2):
                     self.drawPopUp()
             self.switchTurn()
@@ -220,11 +268,10 @@ class UIHandler:
         self.mw.destroy()
 
 
-    def drawWinLineOnCanvas(self):
+    def drawWinLineOnCanvas(self): # SEARCH UP CURVED LINES AND TRY TO IMPLEMENT THAT
         start = self.coordsToCanvas(self.board.winLineStart)
         end = self.coordsToCanvas(self.board.winLineEnd)
-        self.canvasGrid.create_line(start[0], start[1], end[0], end[1], fill = self.textColor, width = 2)
-        print("DRAWN")
+        self.canvasGrid.create_line(start[0], start[1], end[0], end[1], fill = "#87EABF", width = 2)
 
 
     def placePlayerTurnOnCanvas(self, coord):

@@ -20,7 +20,7 @@ class Node:
             "bottomRight": self.getBottomRight,
             "down": self.getDown,
             "bottomLeft": self.getBottomLeft,
-            "Left": self.getLeft,
+            "left": self.getLeft,
             "topLeft": self.getTopLeft,
             }
     
